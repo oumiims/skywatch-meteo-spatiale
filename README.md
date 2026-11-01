@@ -4,7 +4,7 @@
 
 Pipeline de données de bout en bout à partir des données ouvertes de la NASA : collecte d'API, entrepôt BigQuery, modélisation dbt, modèle de Machine Learning et tableau de bord.
 
-📊 **[Voir le tableau de bord Looker Studio](https://datastudio.google.com/reporting/3ec43c75-d20f-4af2-bd2a-a20d25e7410d)**
+🚀 **[Voir l'application Streamlit](https://skywatch-oumaima.streamlit.app)** · 📊 **[Voir le tableau de bord Looker Studio](https://datastudio.google.com/reporting/3ec43c75-d20f-4af2-bd2a-a20d25e7410d)**
 
 ---
 
