@@ -133,6 +133,8 @@ def charger_predictions() -> pd.DataFrame:
     df = pd.read_csv(RACINE / "data" / "predictions.csv")
     df["event_start_time"] = pd.to_datetime(df["event_start_time"].str.replace(" UTC", "", regex=False))
     df["declenche_cme"] = en_booleen(df["declenche_cme"])
+    if "date_prediction" in df:
+        df["date_prediction"] = pd.to_datetime(df["date_prediction"].str.replace(" UTC", "", regex=False))
     return df
 
 
@@ -144,6 +146,9 @@ def charger_modele():
 eruptions = charger_eruptions()
 predictions = charger_predictions()
 test = predictions[predictions["jeu"] == "test"]
+DATE_DONNEES = (predictions["date_prediction"].max().strftime("%d/%m/%Y")
+                if "date_prediction" in predictions else "date inconnue")
+EVAL_INITIALE = "Évaluation initiale (30/09/2026) : 608 éruptions de test, rappel 71 %, précision 55 %."
 
 # --------------------------------------------------------------------------
 # Navigation
@@ -162,6 +167,10 @@ page = st.sidebar.radio(
 st.sidebar.divider()
 st.sidebar.link_button("📊 Dashboard Looker Studio", LIEN_DASHBOARD, width="stretch")
 st.sidebar.link_button("💻 Code sur GitHub", LIEN_GITHUB, width="stretch")
+st.sidebar.caption(
+    f"Données au {DATE_DONNEES} : instantané exporté depuis BigQuery. "
+    "En production, le pipeline les actualise chaque lundi."
+)
 st.sidebar.caption("Oumaïma Elazhari · Wild Code School 2026")
 
 # --------------------------------------------------------------------------
@@ -169,9 +178,10 @@ st.sidebar.caption("Oumaïma Elazhari · Wild Code School 2026")
 # --------------------------------------------------------------------------
 if page == "☀️ Le projet":
     hero(
-        "Peut-on anticiper les tempêtes solaires ?",
-        "Dès la fin d'une éruption solaire, prévoir si elle sera suivie d'une éjection de masse coronale (CME), "
-        "la seule menace qui laisse le temps d'agir.",
+        "Cette éruption solaire sera-t-elle suivie d'une CME ?",
+        "Dès la fin d'une éruption, estimer si elle sera associée à une éjection de masse coronale (CME), "
+        "la seule menace qui laisse le temps d'agir. Le modèle ne prédit pas l'intensité d'une tempête "
+        "géomagnétique sur Terre : il fournit un signal d'alerte précoce.",
     )
 
     st.markdown("## Une éruption, trois menaces")
@@ -194,7 +204,8 @@ if page == "☀️ Le projet":
         f"<div class='carte' style='text-align:center'>"
         f"<div style='width:90px;height:90px;border-radius:50%;background:{ORANGE};color:#0B1621;"
         f"font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px'>RK</div>"
-        f"<h4>Rachel Kim</h4><p>Coordinatrice de la gestion des urgences, Colorado</p></div>",
+        f"<h4>Rachel Kim</h4><p>Coordinatrice de la gestion des urgences, Colorado</p>"
+        f"<p style='font-size:.85rem;color:{GRIS}'><i>Persona fictif, cas d'usage pédagogique</i></p></div>",
         unsafe_allow_html=True,
     )
     c2.markdown(
@@ -247,7 +258,9 @@ elif page == "🛠️ Le pipeline":
     st.markdown(html, unsafe_allow_html=True)
     st.markdown(
         f"<div style='text-align:center;margin-top:12px;padding:12px;border:1px dashed {BLEU};border-radius:12px;color:{BLEU}'>"
-        "<b>GitHub Actions</b> lance toute la chaîne chaque lundi à 6 h UTC</div>",
+        "<b>GitHub Actions</b> lance toute la chaîne chaque lundi à 6 h UTC</div>"
+        f"<p style='color:{GRIS};font-size:.9rem;margin-top:8px'>Cette application de démonstration lit un "
+        f"instantané des tables de production exporté le {DATE_DONNEES}, pour rester publique sans accès à BigQuery.</p>",
         unsafe_allow_html=True,
     )
 
@@ -339,18 +352,26 @@ elif page == "🤖 Le modèle":
     kpis([
         (f"{rappel:.0%}", "des CME détectées (rappel)", ORANGE),
         (f"{precision:.0%}", "des alertes confirmées (précision)", VIOLET),
-        (str(len(test)), "éruptions de test (2025-2026)", BLEU),
+        (str(len(test)), f"éruptions de test au {DATE_DONNEES}", BLEU),
         ("0,4", "seuil d'alerte", "#3FB27F"),
     ])
 
+    st.caption(
+        f"Chiffres recalculés sur les données au {DATE_DONNEES} : chaque lundi, les nouvelles éruptions "
+        f"de 2025-2026 s'ajoutent au jeu de test. {EVAL_INITIALE}"
+    )
+
     st.markdown("## Comment il est construit")
-    etapes = [("SimpleImputer", "médiane"), ("StandardScaler", "même échelle"),
-              ("OneHotEncoder", "classe M / X"), ("LogisticRegression", "class_weight = balanced")]
+    etapes = [("Valeurs manquantes", "SimpleImputer", "remplacées par la médiane"),
+              ("Mise à l'échelle", "StandardScaler", "variables comparables"),
+              ("Encodage", "OneHotEncoder", "classe M / X"),
+              ("Régression logistique", "LogisticRegression", "class_weight = balanced")]
     html = "<div style='display:flex;gap:10px;flex-wrap:wrap'>"
-    for i, (t, s) in enumerate(etapes):
+    for i, (t, code, s) in enumerate(etapes):
         couleur = ORANGE if i == len(etapes) - 1 else BLEU
         html += (f"<div class='carte' style='flex:1;min-width:150px;border-top:4px solid {couleur};text-align:center'>"
-                 f"<h4><code>{t}</code></h4><p style='margin:0'>{s}</p></div>")
+                 f"<h4>{t}</h4><p style='margin:0 0 4px 0'><code>{code}</code></p>"
+                 f"<p style='margin:0;font-size:.9rem'>{s}</p></div>")
         if i < len(etapes) - 1:
             html += f"<div style='align-self:center;color:{ORANGE};font-size:1.6rem'>➜</div>"
     st.markdown(html + "</div>", unsafe_allow_html=True)
