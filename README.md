@@ -55,7 +55,7 @@ flowchart LR
 - **Variables** : 8 variables connues à la fin de l'éruption (intensité, durée, temps de montée, position, historique de la région), calculées sans regarder le futur.
 - **Pipeline scikit-learn** : imputation par la médiane, `StandardScaler`, `OneHotEncoder`, `LogisticRegression(class_weight="balanced")`.
 - **Comparaison** : modèle naïf, forêt aléatoire, régression logistique (retenue).
-- **Évaluation** : découpage temporel, entraînement avant 2025, test sur 608 éruptions de 2025-2026.
+- **Évaluation** : découpage temporel, entraînement avant 2025, test sur 608 éruptions de 2025-2026 (évaluation du 30/09/2026 ; l'application recalcule ces chiffres sur les données les plus récentes).
 
 | Indicateur (seuil 0,4) | Résultat |
 |---|---|
