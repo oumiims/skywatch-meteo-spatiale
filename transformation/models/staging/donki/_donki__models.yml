@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_donki__solar_flares
+    description: "Staging : éruptions solaires DONKI nettoyées. Une ligne par éruption."
+    columns:
+      - name: solar_flare_id
+        description: "Identifiant unique de l'éruption (PK)"
+        tests:
+          - unique
+          - not_null
+
+      - name: event_start_time
+        description: "Heure de début de l'éruption (UTC)"
+        tests:
+          - not_null
+
+      - name: event_peak_time
+        description: "Heure du pic d'intensité (UTC)"
+
+      - name: event_end_time
+        description: "Heure de fin de l'éruption (UTC)"
+
+      - name: flare_class
+        description: "Classification C, M, X — échelle logarithmique, chaque lettre vaut dix fois la précédente"
+        tests:
+          - not_null
+
+      - name: solar_region_location
+        description: "Position sur le disque solaire (ex : N14W102)"
+
+      - name: active_region_number
+        description: "Numéro de la région active du Soleil"
+
+      - name: linked_events
+        description: "Événements liés (CME, SEP) déclenchés par cette éruption"
+
+      - name: version_id
+        description: "Numéro de révision NASA de l'événement"
+
+      - name: nasa_link
+        description: "Lien vers la fiche de l'événement sur le site DONKI"
+
+      - name: inserted_at
+        description: "Horodatage du chargement dans BigQuery"

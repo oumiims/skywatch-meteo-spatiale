@@ -1,0 +1,10 @@
+event_type,libelle,famille,description
+XRA,Rayons X,Rayonnement,Détection d'un pic de rayons X par les satellites GOES
+FLA,Éruption optique,Rayonnement,Éruption observée en lumière visible (raie H-alpha)
+RBR,Sursaut radio fixe,Radio,Sursaut radio mesuré à une fréquence donnée
+RSP,Balayage radio,Radio,Sursaut radio balayant plusieurs fréquences
+DSF,Disparition de filament,Structure,Disparition soudaine d'un filament solaire
+EPL,Protubérance éruptive,Structure,Éjection de matière depuis le limbe solaire
+LPS,Système de protubérances,Structure,Ensemble de protubérances observées
+RNS,Bruit radio,Radio,Émission radio de fond mesurée
+BSL,Structure brillante,Structure,Zone brillante observée sur le disque

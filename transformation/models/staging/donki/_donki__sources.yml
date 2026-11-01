@@ -1,0 +1,31 @@
+version: 2
+
+sources:
+  - name: raw_donki
+    project: "{{ env_var('GCP_PROJECT') }}"
+    schema: raw_donki
+    description: "Données brutes DONKI (NASA) : éruptions solaires"
+    tables:
+      - name: solar_flares
+        description: "Événements d'éruptions solaires collectés via l'API DONKI"
+        columns:
+          - name: flrid
+            description: "Identifiant unique de l'éruption"
+          - name: classtype
+            description: "Classification (C, M, X) — intensité de l'éruption. Échelle logarithmique : chaque lettre vaut dix fois la précédente."
+          - name: begintime
+            description: "Heure de début de l'éruption (UTC)"
+          - name: peaktime
+            description: "Heure du pic de l'éruption (UTC)"
+          - name: endtime
+            description: "Heure de fin de l'éruption (UTC)"
+          - name: sourcelocation
+            description: "Position sur le disque solaire (N, S, E, W)"
+          - name: activeregionnum
+            description: "Numéro de la région active du Soleil"
+          - name: linkedevents
+            description: "Événements liés (CME, SEP) déclenchés par cette éruption"
+          - name: row_hash
+            description: "Empreinte SHA-256 de la ligne, clé technique de déduplication"
+          - name: inserted_at
+            description: "Horodatage du chargement dans BigQuery"

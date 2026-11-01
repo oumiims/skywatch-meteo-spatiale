@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_noaa__events
+    description: "Staging : événements météo spatiale NOAA SWPC nettoyés. Une ligne par événement observé."
+    columns:
+      - name: event_id
+        description: "Identifiant technique de l'événement (empreinte SHA-256 de la ligne brute). NOAA ne fournit pas d'identifiant métier."
+        tests:
+          - unique
+          - not_null
+
+      - name: event_start_time
+        description: "Heure de début de l'événement (UTC)"
+        tests:
+          - not_null
+
+      - name: event_peak_time
+        description: "Heure du pic d'intensité (UTC)"
+
+      - name: event_end_time
+        description: "Heure de fin de l'événement (UTC)"
+
+      - name: event_type
+        description: "Type d'événement : XRA (rayons X), RSP (balayage radio), FLA (éruption optique), RBR (sursaut radio), DSF (disparition de filament)"
+        tests:
+          - not_null
+
+      - name: event_type_code
+        description: "Code numérique du type d'événement"
+
+      - name: observatory
+        description: "Station ou satellite ayant observé l'événement"
+
+      - name: observation_quality
+        description: "Indicateur de qualité de l'observation fourni par NOAA"
+
+      - name: active_region_number
+        description: "Numéro de la région active solaire associée, si identifiée"
+
+      - name: solar_region_location
+        description: "Position sur le disque solaire (ex : N14W102)"
+
+      - name: radio_frequency
+        description: "Fréquence radio observée, pour les événements de type radio"
+
+      - name: inserted_at
+        description: "Horodatage du chargement dans BigQuery"

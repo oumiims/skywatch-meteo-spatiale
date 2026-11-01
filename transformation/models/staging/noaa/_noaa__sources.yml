@@ -1,0 +1,31 @@
+version: 2
+
+sources:
+  - name: raw_noaa
+    project: "{{ env_var('GCP_PROJECT') }}"
+    schema: raw_noaa
+    description: "Données brutes NOAA SWPC : événements météo spatiale"
+    tables:
+      - name: raw_noaa_events
+        description: "Événements météo spatiale (X-ray, radio bursts, etc.) collectés via le flux edited_events de NOAA SWPC"
+        columns:
+          - name: begin_datetime
+            description: "Heure de début de l'événement (UTC)"
+          - name: max_datetime
+            description: "Heure du pic de l'événement (UTC)"
+          - name: end_datetime
+            description: "Heure de fin de l'événement (UTC)"
+          - name: quality
+            description: "Indicateur de qualité de l'observation"
+          - name: type
+            description: "Type d'événement : XRA (rayons X), RBR (sursaut radio), RSP (balayage radio), FLA (éruption optique)"
+          - name: observatory
+            description: "Station ou satellite ayant observé l'événement"
+          - name: coded_type
+            description: "Code numérique du type d'événement"
+          - name: region
+            description: "Numéro de la région active solaire associée"
+          - name: row_hash
+            description: "Empreinte SHA-256 de la ligne, clé technique de déduplication"
+          - name: inserted_at
+            description: "Horodatage du chargement dans BigQuery"

@@ -1,0 +1,115 @@
+version: 2
+
+models:
+  - name: dim_active_regions
+    description: "Dimension conforme : une région active du Soleil, partagée entre les deux sources. NOAA utilise un format à 4 chiffres, aligné ici sur le numéro complet DONKI."
+    columns:
+      - name: active_region_number
+        description: "Numéro de la région active (format DONKI, 5 chiffres)"
+        tests:
+          - unique
+          - not_null
+      - name: nb_eruptions_donki
+        description: "Nombre d'éruptions cataloguées par DONKI sur cette région"
+      - name: nb_observations_noaa
+        description: "Nombre de détections NOAA sur cette région"
+
+  - name: dim_event_types
+    description: "Référentiel des types d'événements NOAA, décodés en libellés lisibles."
+    columns:
+      - name: event_type
+        description: "Code du type d'événement (XRA, RBR, RSP...)"
+        tests:
+          - unique
+          - not_null
+      - name: libelle
+        description: "Libellé lisible du type"
+        tests:
+          - not_null
+      - name: famille
+        description: "Regroupement : Rayonnement, Radio ou Structure"
+      - name: nb_evenements
+        description: "Nombre d'événements observés de ce type"
+
+  - name: fct_solar_flares
+    description: "Faits : une ligne par éruption solaire cataloguée par la NASA (DONKI)."
+    columns:
+      - name: solar_flare_id
+        description: "Identifiant NASA de l'éruption (PK)"
+        tests:
+          - unique
+          - not_null
+
+      - name: date_key
+        description: "Date de l'éruption (FK vers dim_date, dimension conforme partagée)"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: active_region_number
+        description: "Région active d'origine (FK vers dim_active_regions)"
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_active_regions')
+                field: active_region_number
+
+      - name: event_start_time
+        description: "Heure de début de l'éruption (UTC)"
+        tests:
+          - not_null
+      - name: duree_minutes
+        description: "Durée de l'éruption, du début à la fin"
+      - name: flare_class
+        description: "Classe complète (ex : M8.1)"
+      - name: classe_lettre
+        description: "Lettre de la classe : C, M ou X. Échelle logarithmique, chaque lettre vaut dix fois la précédente."
+      - name: classe_multiplicateur
+        description: "Multiplicateur dans la classe (le 8.1 de M8.1)"
+
+  - name: fct_noaa_events
+    description: "Faits : une ligne par détection instrumentale NOAA SWPC. Grain plus fin que DONKI — une éruption peut produire plusieurs détections."
+    columns:
+      - name: event_id
+        description: "Identifiant technique de la détection (PK)"
+        tests:
+          - unique
+          - not_null
+
+      - name: date_key
+        description: "Date de la détection (FK vers dim_date, dimension conforme partagée)"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+
+      - name: active_region_number
+        description: "Région active observée (FK vers dim_active_regions)"
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_active_regions')
+                field: active_region_number
+
+      - name: event_type
+        description: "Type de détection (FK vers dim_event_types)"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_event_types')
+                field: event_type
+
+      - name: event_start_time
+        description: "Heure de début de la détection (UTC)"
+        tests:
+          - not_null
+      - name: duree_minutes
+        description: "Durée de la détection"
+      - name: observatory
+        description: "Station ou satellite observateur"
